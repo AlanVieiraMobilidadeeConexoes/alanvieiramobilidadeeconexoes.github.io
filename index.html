@@ -83,6 +83,20 @@
 
   footer{margin-top:auto; padding-top:36px; font-size:12px; color:#6f7176; line-height:1.6}
   footer a{color:var(--prata); text-decoration:none}
+  .folha{position:fixed; inset:0; z-index:10}
+  .folha[hidden]{display:none}
+  .folha-fundo{position:absolute; inset:0; background:rgba(0,0,0,.65)}
+  .folha-caixa{position:absolute; left:0; right:0; bottom:0; max-width:480px; margin:0 auto;
+    background:var(--grafite); border-top:2px solid var(--dourado); border-radius:20px 20px 0 0;
+    padding:22px 18px max(22px, env(safe-area-inset-bottom)); display:flex; flex-direction:column; gap:12px; text-align:left}
+  .folha-titulo{font-weight:700; font-size:17px; color:var(--prata); text-align:center; margin-bottom:4px}
+  .folha-botao{display:block; padding:14px 16px; border-radius:14px; text-decoration:none; color:var(--texto);
+    background:var(--grafite2); border:1px solid #3a3b40}
+  .folha-botao strong{display:block; font-size:16px}
+  .folha-botao small{display:block; margin-top:4px; font-size:13px; line-height:1.4; color:var(--suave)}
+  .folha-botao.principal-f{background:linear-gradient(180deg,var(--dourado-claro),var(--dourado)); color:#141414; border:0}
+  .folha-botao.principal-f small{color:#2b2410}
+  .folha-fechar{margin-top:4px; padding:12px; background:none; border:0; color:var(--suave); font-size:15px}
 </style>
 </head>
 <body>
@@ -144,24 +158,33 @@
     © Alan Vieira | Mobilidade &amp; Conexões
   </footer>
 </main>
+<!-- Android: opções para salvar o contato -->
+<div class="folha" id="folha" hidden>
+  <div class="folha-fundo" data-fechar></div>
+  <div class="folha-caixa" role="dialog" aria-labelledby="folha-titulo">
+    <p class="folha-titulo" id="folha-titulo">Salvar Alan Vieira na agenda</p>
+    <a class="folha-botao principal-f" href="tel:+5521920495983">
+      <strong>Abrir na agenda do celular</strong>
+      <small>Abre o número (21) 92049-5983. Toque em “Criar contato” e digite o nome <b>Alan Vieira</b>.</small>
+    </a>
+    <a class="folha-botao" href="contato.vcf">
+      <strong>Salvar com nome automático</strong>
+      <small>Baixa o cartão de contato já preenchido. Depois toque em “Abrir” no aviso de download.</small>
+    </a>
+    <button class="folha-fechar" type="button" data-fechar>Cancelar</button>
+  </div>
+</div>
 <script>
-  // Android: tenta abrir direto a tela "Novo contato" do celular, já preenchida.
-  // Se o celular não permitir, cai automaticamente no arquivo contato.vcf.
+  // iPhone: o contato.vcf abre direto na tela "Novo contato".
+  // Android: o navegador não deixa um site abrir a agenda direto, então mostramos duas opções.
   (function () {
-    if (!/Android/i.test(navigator.userAgent)) return; // iPhone abre o contato.vcf direto na tela de contato
-    var vcf = location.origin + location.pathname.replace(/[^\/]*$/, "") + "contato.vcf";
-    var intent = "intent:#Intent;action=android.intent.action.INSERT;" +
-      "type=vnd.android.cursor.dir/contact;" +
-      "S.name=" + encodeURIComponent("Alan Vieira") + ";" +
-      "S.job_title=" + encodeURIComponent("Motorista Particular") + ";" +
-      "S.phone=" + encodeURIComponent("+5521920495983") + ";" +
-      "S.browser_fallback_url=" + encodeURIComponent(vcf) + ";end";
-    var btn = document.getElementById("btn-contato");
-    btn.setAttribute("href", intent);
-    btn.removeAttribute("type");
-    btn.addEventListener("click", function () {
-      document.getElementById("dica-contato").textContent =
-        "Se o celular baixar o arquivo, toque em “Abrir” no aviso de download para salvar o contato.";
+    if (!/Android/i.test(navigator.userAgent)) return;
+    var folha = document.getElementById("folha");
+    document.getElementById("btn-contato").addEventListener("click", function (e) {
+      e.preventDefault(); folha.hidden = false;
+    });
+    folha.addEventListener("click", function (e) {
+      if (e.target.hasAttribute("data-fechar")) folha.hidden = true;
     });
   })();
 </script>
