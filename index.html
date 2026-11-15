@@ -136,7 +136,7 @@
     </a>
   </div>
 
-  <p class="dica">Ao salvar o contato, confirme a inclusão na tela que abrir no seu celular.</p>
+  <p class="dica" id="dica-contato">Ao salvar o contato, confirme a inclusão na tela que abrir no seu celular.</p>
 
   <footer>
     WhatsApp: <a href="https://wa.me/5521920495983" target="_blank" rel="noopener">(21) 92049-5983</a><br>
@@ -144,5 +144,26 @@
     © Alan Vieira | Mobilidade &amp; Conexões
   </footer>
 </main>
+<script>
+  // Android: tenta abrir direto a tela "Novo contato" do celular, já preenchida.
+  // Se o celular não permitir, cai automaticamente no arquivo contato.vcf.
+  (function () {
+    if (!/Android/i.test(navigator.userAgent)) return; // iPhone abre o contato.vcf direto na tela de contato
+    var vcf = location.origin + location.pathname.replace(/[^\/]*$/, "") + "contato.vcf";
+    var intent = "intent:#Intent;action=android.intent.action.INSERT;" +
+      "type=vnd.android.cursor.dir/contact;" +
+      "S.name=" + encodeURIComponent("Alan Vieira") + ";" +
+      "S.job_title=" + encodeURIComponent("Motorista Particular") + ";" +
+      "S.phone=" + encodeURIComponent("+5521920495983") + ";" +
+      "S.browser_fallback_url=" + encodeURIComponent(vcf) + ";end";
+    var btn = document.getElementById("btn-contato");
+    btn.setAttribute("href", intent);
+    btn.removeAttribute("type");
+    btn.addEventListener("click", function () {
+      document.getElementById("dica-contato").textContent =
+        "Se o celular baixar o arquivo, toque em “Abrir” no aviso de download para salvar o contato.";
+    });
+  })();
+</script>
 </body>
 </html>
